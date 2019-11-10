@@ -5,11 +5,12 @@ const {
     Pool
 } = require("pg")
 const pool = new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "Teamwork",
-    password: "ayofe2020",
-    port: "5432"
+   
+    user: process.env.userpq,
+    host: process.env.host,
+    database: process.env.databasepq,
+    password: process.env.passwordpq,
+    port: process.env.port
 })
 
 router.get("/articles/:articleid", auth.decodeToken, (req, resp) => {
@@ -59,7 +60,7 @@ router.get("/gifs/:gifid", auth.decodeToken, (req, resp) => {
     let comments = {}
     pool.query("SELECT * FROM image WHERE image_id = $1", [id], (err, res) => {
         if (err) {
-            console.log(err)
+            console.log(err,process.env.userpq)
             return resp.json({
                 status: "Error",
                 error: "Datatbase error"

@@ -7,11 +7,11 @@ const {
     Pool
 } = require("pg")
 const pool = new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "Teamwork",
-    password: "ayofe2020",
-    port: "5432"
+    user: process.env.dbuser,
+    host: process.env.host,
+    database: process.env.database,
+    password: process.env.password,
+    port: process.env.port
 })
 
 
@@ -173,7 +173,7 @@ router.post("/gifs", auth.decodeToken, parser.single("image"), (req, resp) => {
             status: "success",
             data: {
                 tittle,
-                image_id:res2.rows[res2.rows.length - 1],
+                image_id:res2.rows[res2.rows.length - 1].image_id,
                 createdOn:time,
                 imageUrl:url
             }
