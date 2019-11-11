@@ -1,22 +1,14 @@
+
 const express = require("express")
+
 const router = express.Router()
 const auth = require("../middleware/token")
-const {
-    Pool
-} = require("pg")
-const pool = new Pool({
-   
-    user: process.env.userpq,
-    host: process.env.host,
-    database: process.env.databasepq,
-    password: process.env.passwordpq,
-    port: process.env.port
-})
+const {client} = require("../app")
 
-router.get("/articles/:articleid", auth.decodeToken, (req, resp) => {
+router.get("/api/v1/articles/:articleid", auth.decodeToken, (req, resp) => {
     let id = req.params.articleid
     let comments = {}
-    pool.query("SELECT * FROM article WHERE article_id = $1", [id], (err, res) => {
+    client.query("SELECT * FROM article WHERE article_id = $1", [id], (err, res) => {
         if (err) {
             console.log(err)
             return resp.json({
@@ -32,7 +24,7 @@ router.get("/articles/:articleid", auth.decodeToken, (req, resp) => {
             article
         } = res.rows[0]
 
-        pool.query("SELECT comment, comment_id,  person_id FROM article_comment WHERE article_id =$1", [id], (err, res2) => {
+        client.query("SELECT comment, comment_id,  person_id FROM article_comment WHERE article_id =$1", [id], (err, res2) => {
             if (err) {
                 console.log(err)
                 return resp.json({
@@ -55,10 +47,10 @@ router.get("/articles/:articleid", auth.decodeToken, (req, resp) => {
     })
 })
 
-router.get("/gifs/:gifid", auth.decodeToken, (req, resp) => {
+router.get("/api/v1/gifs/:gifid", auth.decodeToken, (req, resp) => {
     let id = req.params.gifid
     let comments = {}
-    pool.query("SELECT * FROM image WHERE image_id = $1", [id], (err, res) => {
+    client.query("SELECT * FROM image WHERE image_id = $1", [id], (err, res) => {
         if (err) {
             console.log(err,process.env.userpq)
             return resp.json({
@@ -74,7 +66,7 @@ router.get("/gifs/:gifid", auth.decodeToken, (req, resp) => {
             url
         } = res.rows[0]
 
-        pool.query("SELECT comment, comment_id,person_id FROM image_comment WHERE image_id =$1", [id], (err, res2) => {
+        client.query("SELECT comment, comment_id,person_id FROM image_comment WHERE image_id =$1", [id], (err, res2) => {
             if (err) {
                 console.log(err)
                 return resp.json({

@@ -3,20 +3,11 @@ const bcrypt = require("bcrypt")
 const router = express.Router()
 const auth = require("../middleware/token")
 const parser = require("../middleware/util")
-const {
-    Pool
-} = require("pg")
-const pool = new Pool({
-    user: process.env.dbuser,
-    host: process.env.host,
-    database: process.env.database,
-    password: process.env.password,
-    port: process.env.port
-})
+const {client} = require("../app")
 
 
 
-router.post("/auth/create-use", auth.decodeToken, (req, resp) => {
+router.post("/api/v1/auth/create-use", auth.decodeToken, (req, resp) => {
 
     if (req.data.jobrole != "admin") {
         resp.statusCode = 400
@@ -37,14 +28,14 @@ router.post("/auth/create-use", auth.decodeToken, (req, resp) => {
         department
     } = req.body
     let payload = {}
-    pool.query("INSERT INTO Person (firstname,lastname,email,jobrole,address,gender,department,hashpassword) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ", [firstname, lastname, email, jobrole, address, gender, department, pass], (err, res) => {
+    client.query("INSERT INTO Person (firstname,lastname,email,jobrole,address,gender,department,hashpassword) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ", [firstname, lastname, email, jobrole, address, gender, department, pass], (err, res) => {
         if (err) {
             return resp.status(400).json({
                 status: "Error",
                 error: "Datatbase error or network"
             })
         }
-        pool.query("SELECT userid,firstname,lastname,hashpassword,jobrole,email FROM Person WHERE Person.email =$1;", [email], (err, res2) => {
+        client.query("SELECT userid,firstname,lastname,hashpassword,jobrole,email FROM Person WHERE Person.email =$1;", [email], (err, res2) => {
             if (err) {
                 return resp.status(400).json({
                     status: "Error",
@@ -68,8 +59,8 @@ router.post("/auth/create-use", auth.decodeToken, (req, resp) => {
 
 
 })
-router.post("/auth/signin", (req, resp) => {
-    pool.query("SELECT * FROM Person WHERE Person.email =$1;", [req.body.email], (err, res) => {
+router.post("/api/v1/auth/signin", (req, resp) => {
+    client.query("SELECT * FROM Person WHERE Person.email =$1;", [req.body.email], (err, res) => {
         if ((res.rows[0]) == undefined) {
             resp.statusCode = 400
             return resp.json({
@@ -108,7 +99,7 @@ router.post("/auth/signin", (req, resp) => {
 
 })
 
-router.post("/auth/articles", auth.decodeToken, (req, resp) => {
+router.post("/api/v1/auth/articles", auth.decodeToken, (req, resp) => {
     let {
         article,
         tittle
@@ -117,14 +108,14 @@ router.post("/auth/articles", auth.decodeToken, (req, resp) => {
         userid
     } = req.data
     let createdTime = new Date()
-    pool.query("INSERT INTO article (article,tittle,person_id,created_time) VALUES($1,$2,$3,$4)", [article, tittle, userid, createdTime], (err, res) => {
+    client.query("INSERT INTO article (article,tittle,person_id,created_time) VALUES($1,$2,$3,$4)", [article, tittle, userid, createdTime], (err, res) => {
         if (err) {
             return resp.status(400).json({
                 status: "Error",
                 error: "database error"
             })
         }
-        pool.query("SELECT tittle,article_id,created_time FROM article WHERE person_id = $1", [req.data.userid], (err, res2) => {
+        client.query("SELECT tittle,article_id,created_time FROM article WHERE person_id = $1", [req.data.userid], (err, res2) => {
             if (err) {
                 return resp.status(400).json({
                     status: "Error",
@@ -150,19 +141,21 @@ router.post("/auth/articles", auth.decodeToken, (req, resp) => {
 
 })
 
-router.post("/gifs", auth.decodeToken, parser.single("image"), (req, resp) => {
+router.post("/api/v1/gifs", auth.decodeToken, parser.single("image"), (req, resp) => {
     let {tittle} = req.body
     let {url} = req.file
     let time = req.file.created_at
     let id = req.data.userid
-     pool.query("INSERT INTO image (tittle,person_id,created_on,url) VALUES($1,$2,$3,$4)", [ tittle, id,time,url], (err, res) => {
+    console.log(req.file)
+     client.query("INSERT INTO image (tittle,person_id,created_on,url) VALUES($1,$2,$3,$4)", [ tittle, id,time,url], (err, res) => {
+         console.log(res,err)
         if (err) {
             return resp.status(400).json({
                 status: "Error",
                 error: "database error"
             })
         }
-       pool.query("SELECT image_id FROM image WHERE person_id = $1", [id], (err,res2) =>{
+       client.query("SELECT image_id FROM image WHERE person_id = $1", [id], (err,res2) =>{
         if (err) {
             return resp.status(400).json({
                 status: "Error",

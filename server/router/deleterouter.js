@@ -2,21 +2,12 @@ const express = require("express")
 const bcrypt = require("bcrypt")
 const router = express.Router()
 const auth = require("../middleware/token")
-const {
-    Pool
-} = require("pg")
-const pool = new Pool({
-    user: process.env.userpq,
-    host: process.env.host,
-    database: process.env.databasepq,
-    password: process.env.passwordpq,
-    port: process.env.port
-})
+const {client} = require("../app")
 
 
-router.delete("/articles/:articlesid", auth.decodeToken, (req, resp) => {
+router.delete("/api/v1/articles/:articlesid", auth.decodeToken, (req, resp) => {
 
-    pool.query("SELECT person_id FROM article WHERE article_id =$1;", [articleId], (err, res) => {
+    client.query("SELECT person_id FROM article WHERE article_id =$1;", [articleId], (err, res) => {
         if (err) {
             return resp.json({
                 status: "Error",
@@ -32,10 +23,10 @@ router.delete("/articles/:articlesid", auth.decodeToken, (req, resp) => {
     })
 })
 
-router.delete("/image/:imageid", auth.decodeToken, (req, resp) => {
+router.delete("/api/v1/image/:imageid", auth.decodeToken, (req, resp) => {
     let imageId = req.params.imageid
 
-    pool.query("SELECT person_id FROM image WHERE image_id =$1;", [imageId], (err, res) => {
+    client.query("SELECT person_id FROM image WHERE image_id =$1;", [imageId], (err, res) => {
         if (err) {
             return resp.json({
                 status: "Error",
@@ -48,7 +39,7 @@ router.delete("/image/:imageid", auth.decodeToken, (req, resp) => {
                 error: "Invalid permission"
             })
         }
-        pool.query("DELETE FROM image WHERE image_id=$1",[imageId], (err,res2) =>{
+        client.query("DELETE FROM image WHERE image_id=$1",[imageId], (err,res2) =>{
             if (err){
                 return resp.json({
                     status: "Error",
