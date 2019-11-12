@@ -1,9 +1,9 @@
 require("dotenv").config()
 const express = require("express")
-const {
+var {
     Client
 } = require("pg");
-const client = new Client({
+var client = new Client({
     ssl: true,
     connectionString: process.env.database_url
 })
