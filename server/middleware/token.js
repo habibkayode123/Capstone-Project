@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 const createToken = (payload = {
     see: "in action"
 }) => {
-    return jwt.sign(payload, process.env.secret)
+    return jwt.sign("i am pushing it")
 
 }
 const decodeToken = (req, resp, next) => {
