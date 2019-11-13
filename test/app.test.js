@@ -18,6 +18,7 @@ describe('All POST route', () => {
         password: "Password123"
       })
       .end((request, response) => {
+      console.log(response)
         response.body.should.have.property('status').equal("success")
         response.should.have.status(200)
         response.body.should.have.property('token')
