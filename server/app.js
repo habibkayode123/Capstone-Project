@@ -5,7 +5,7 @@ var {
 } = require("pg");
 var client = new Client({
     ssl: true,
-    connectionString: process.env.database_url
+    connectionString: "postgres://hwynqtegjipaco:fd239927b987b7e47007ada8c3a63600cf718c843284a4a87ed413c42f972344@ec2-54-235-181-55.compute-1.amazonaws.com:5432/d5ph5cvtt0v530"
 })
 client.connect()
 module.exports.client = client
