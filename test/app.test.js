@@ -21,6 +21,7 @@ describe('All POST route', () => {
         response.body.should.have.property('status').equal("success")
         response.should.have.status(200)
         response.body.should.have.property('token')
+        
       });
     done();
   });
