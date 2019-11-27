@@ -3,12 +3,14 @@ const bcrypt = require("bcrypt")
 const router = express.Router()
 const auth = require("../middleware/token")
 const parser = require("../middleware/util")
-const {client} = require("../app")
+const {
+    client
+} = require("../app")
 
 
 
 router.post("/api/v1/auth/create-use", auth.decodeToken, (req, resp) => {
-
+console.log(req.body)
     if (req.data.jobrole != "admin") {
         resp.statusCode = 400
         return resp.json({
@@ -30,6 +32,7 @@ router.post("/api/v1/auth/create-use", auth.decodeToken, (req, resp) => {
     let payload = {}
     client.query("INSERT INTO Person (firstname,lastname,email,jobrole,address,gender,department,hashpassword) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ", [firstname, lastname, email, jobrole, address, gender, department, pass], (err, res) => {
         if (err) {
+            console.log(err)
             return resp.status(400).json({
                 status: "Error",
                 error: "Datatbase error or network"
@@ -60,11 +63,19 @@ router.post("/api/v1/auth/create-use", auth.decodeToken, (req, resp) => {
 
 })
 router.post("/api/v1/auth/signin", (req, resp) => {
+    console.log("i am here", req.body.email)
     client.query("SELECT * FROM Person WHERE Person.email =$1;", [req.body.email], (err, res) => {
+        if(err){
+            console.log(err)
+            
+        }
+    
         if ((res.rows[0]) == undefined) {
             resp.statusCode = 400
             return resp.json({
+                status: "error",
                 error: "invalid email"
+
             });
         }
         const {
@@ -77,8 +88,25 @@ router.post("/api/v1/auth/signin", (req, resp) => {
         } = res.rows[0]
         bcrypt.compare(req.body.password, hashpassword, (err, sus) => {
             if (err) {
-                return console.log("wrong password")
+                resp.statusCode = 400
+                return resp.json({
+                    status: "error",
+                    error: "incorrect email"
+
+                });
+
             }
+
+            if (sus == false) {
+                resp.statusCode = 400
+                return resp.json({
+                    status: "error",
+                    error: "incorrect password"
+
+                });
+
+            }
+            console.log(sus)
             let token = auth.createToken({
                 hashpassword,
                 email,
@@ -89,9 +117,10 @@ router.post("/api/v1/auth/signin", (req, resp) => {
             })
             resp.statusCode = 200
             resp.json({
-                token,
                 status: "success",
-                userid
+                token,
+                userid,
+                jobrole
             })
 
         })
@@ -142,37 +171,41 @@ router.post("/api/v1/auth/articles", auth.decodeToken, (req, resp) => {
 })
 
 router.post("/api/v1/gifs", auth.decodeToken, parser.single("image"), (req, resp) => {
-    let {tittle} = req.body
-    let {url} = req.file
+    let {
+        tittle
+    } = req.body
+    let {
+        url
+    } = req.file
     let time = req.file.created_at
     let id = req.data.userid
     console.log(req.file)
-     client.query("INSERT INTO image (tittle,person_id,created_on,url) VALUES($1,$2,$3,$4)", [ tittle, id,time,url], (err, res) => {
-         console.log(res,err)
+    client.query("INSERT INTO image (tittle,person_id,created_on,url) VALUES($1,$2,$3,$4)", [tittle, id, time, url], (err, res) => {
+        console.log(res, err)
         if (err) {
             return resp.status(400).json({
                 status: "Error",
                 error: "database error"
             })
         }
-       client.query("SELECT image_id FROM image WHERE person_id = $1", [id], (err,res2) =>{
-        if (err) {
-            return resp.status(400).json({
-                status: "Error",
-                error: "database error in 2"
-            })
-        }
-        return resp.status(200).json({
-            status: "success",
-            data: {
-                tittle,
-                image_id:res2.rows[res2.rows.length - 1].image_id,
-                createdOn:time,
-                imageUrl:url
+        client.query("SELECT image_id FROM image WHERE person_id = $1", [id], (err, res2) => {
+            if (err) {
+                return resp.status(400).json({
+                    status: "Error",
+                    error: "database error in 2"
+                })
             }
+            return resp.status(200).json({
+                status: "success",
+                data: {
+                    tittle,
+                    image_id: res2.rows[res2.rows.length - 1].image_id,
+                    createdOn: time,
+                    imageUrl: url
+                }
+            })
+
         })
-           
-       } )
     })
 
 

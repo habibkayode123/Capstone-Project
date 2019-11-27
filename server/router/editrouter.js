@@ -10,7 +10,6 @@ router.patch("/api/v1/articles/:articleid", auth.decodeToken, (req, resp) => {
     let article = req.body.article
     let tittle = req.body.tittle
     console.log(req.data)
-client.connect()
     client.query("SELECT person_id FROM article WHERE article_id =$1;", [articleId], (err, res) => {
         if (err) {
             return resp.json({

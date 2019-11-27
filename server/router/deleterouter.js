@@ -6,6 +6,7 @@ const {client} = require("../app")
 
 
 router.delete("/api/v1/articles/:articlesid", auth.decodeToken, (req, resp) => {
+    let articleId = req.body.params
 
     client.query("SELECT person_id FROM article WHERE article_id =$1;", [articleId], (err, res) => {
         if (err) {
@@ -20,6 +21,19 @@ router.delete("/api/v1/articles/:articlesid", auth.decodeToken, (req, resp) => {
                 error: "Invalid permission"
             })
         }
+        client.query("DELETE FROM article WHERE article_id=$1",[articleId], (err,res2) =>{
+            if (err){
+                return resp.json({
+                    status: "Error",
+                    error: "Invalid permission"
+                })
+            }
+            return resp.status(200).json({
+                status: "success",
+                data: {
+              message:"article successfully deleted"  }
+            })
+        })
     })
 })
 

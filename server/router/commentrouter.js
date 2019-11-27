@@ -39,7 +39,9 @@ router.post("/api/v1/gifs/:gifid/comment",auth.decodeToken,(req,resp) => {
                 message:"comment successfully created",
                 createdOn:new Date ().toUTCString(),
                 gifTitle:tittle,
-                comment
+                personId:id,
+                comment,
+                
             }
         })
     })
@@ -85,8 +87,10 @@ router.post("/api/v1/articles/:articleid/comment",auth.decodeToken,(req,resp) =>
             message:"comment successfully created",
             createdOn:new Date ().toUTCString(),
             articleTitle:tittle,
+            personId:id,
             article,
-            comment
+            comment,
+            
         }
     })
     })

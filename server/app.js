@@ -1,15 +1,21 @@
 require("dotenv").config()
 const express = require("express")
+const cors = require("cors")
 var {
     Client
 } = require("pg");
 var client = new Client({
-    ssl: true,
-    connectionString: process.env.database_url
+    user:process.env.user,
+    host:"localhost",
+    database:process.env.database,
+    password:process.env.password,
+    //ssl: true,
+  //  connectionString: process.env.database_url
 })
 client.connect()
 module.exports.client = client
 const app = express()
+app.use(cors())
 const bodyParser = require("body-parser")
 const postRouter = require("./router/post")
 const editRouter = require("./router/editrouter")
@@ -29,7 +35,7 @@ app.use(viewRouter)
 
 
 
-app.listen(3000, () => {
+app.listen(3002, () => {
     console.log("connet")
 })
 

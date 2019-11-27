@@ -1,10 +1,14 @@
 {
+  "engines": {
+    "node": "10.x"
+  },
   "name": "capstone-project",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --timeout 10000 --recursive"
+    "test": "mocha --timeout 10000 --recursive",
+    "start": "node server/app"
   },
   "repository": {
     "type": "git",
