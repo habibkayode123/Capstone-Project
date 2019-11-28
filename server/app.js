@@ -36,7 +36,7 @@ app.use(viewRouter)
 
 
 app.listen(process.env.PORT || 3002, () => {
-    console.log("connet")
+    console.log("connet",process.env.PORT)
 })
 
 
