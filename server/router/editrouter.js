@@ -33,8 +33,9 @@ router.patch("/api/v1/articles/:articleid", auth.decodeToken, (req, resp) => {
             return resp.json({
                 status: "success",
                 data: {
+                    message:"Article successfully updated",
                     article,
-                    tittle
+                    title:title
                 }
             })
 
