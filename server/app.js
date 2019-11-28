@@ -5,12 +5,12 @@ var {
     Client
 } = require("pg");
 var client = new Client({
-    user:process.env.user,
+  /*  user:process.env.user,
     host:"localhost",
     database:process.env.database,
-    password:process.env.password,
-    //ssl: true,
-  //  connectionString: process.env.database_url
+    password:process.env.password, */
+    ssl: true,
+    connectionString: process.env.database_url
 })
 client.connect()
 module.exports.client = client
@@ -35,7 +35,7 @@ app.use(viewRouter)
 
 
 
-app.listen(3002, () => {
+app.listen(process.env.PORT || 3002, () => {
     console.log("connet")
 })
 
