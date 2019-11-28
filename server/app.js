@@ -9,7 +9,7 @@ var client = new Client({
     host:"localhost",
     database:process.env.database,
     password:process.env.password, */
-    ssl: true,
+   // ssl: true,
     connectionString: process.env.database_url
 })
 client.connect()
@@ -32,6 +32,9 @@ app.use(deletRouter)
 app.use(commentRouter)
 app.use(postRouter)
 app.use(viewRouter)
+app.get("/",(req,resp)=>{
+    resp.send("you are welcome")
+})
 
 
 
